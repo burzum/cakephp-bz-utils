@@ -2,9 +2,15 @@
 
 This plugin is a collection of CakePHP utils.
 
+## Components ##
+
+### Auth ###
+
+* SimpleRbacAuthorize	- Basic multi-role non database RBAC, using an array as permission map
+
 ## Helpers
 
-* TableHelper        - Table Output Helper using anonymous callbacks
+* TableHelper			- Table Output Helper using anonymous callbacks
 
 ## Requirements ##
 
