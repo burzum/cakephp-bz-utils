@@ -11,7 +11,7 @@ App::uses('FileLog', 'Log/Engine');
  * @copyright 2012 Florian Krämer
  * @license MIT
  */
-class ExtFileLog extends FileLog {
+class ExtendedFileLog extends FileLog {
 /**
  * Implements writing to log files.
  *
