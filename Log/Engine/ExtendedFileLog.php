@@ -21,7 +21,7 @@ class ExtendedFileLog extends FileLog {
  */
 	public function write($type, $message) {
 		$trace = debug_backtrace();
-		if (isset($trace[2])) {
+		if (isset($trace[2]) && isset($trace[2]['file']) && isset($trace[2]['line'])) {
 			parent::write($type, $trace[2]['file'] . ' Line: ' . $trace[2]['line']);
 		}
 		parent::write($type, $message);
