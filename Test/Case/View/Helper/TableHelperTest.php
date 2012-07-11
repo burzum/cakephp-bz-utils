@@ -9,7 +9,7 @@ App::uses('TableHelper', 'BzUtils.View/Helper');
  * @package		BzUtils
  * @subpackage	BzUtils.Test.Case.View.Helper
  */
-class BzUtilsHelperTest extends CakeTestCase {
+class TableHelperTest extends CakeTestCase {
 /**
  * Test data
  *
