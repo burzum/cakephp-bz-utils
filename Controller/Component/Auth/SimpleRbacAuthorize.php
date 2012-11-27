@@ -27,24 +27,26 @@ class SimpleRbacAuthorize extends BaseAuthorize {
  * @return boolean
  */
 	public function authorize($user, CakeRequest $request) {
-		$userModel = $this->settings['userModel'];
+		$roleField = $this->settings['roleField'];
 		extract($this->getConrollerNameAndAction($request));
 
+		if (is_string($user[$roleField])) {
+			$user[$roleField] = array($user[$roleField]);
+		}
+
 		$actionMap = $this->getActionMap();
-		if (isset($actionMap[$name][$action])) {
+		if (isset($actionMap[$name])) {
 			if (in_array('*', $actionMap[$name])) {
 				return true;
 			}
+		}
 
+		if (isset($actionMap[$name][$action])) {
 			if (in_array('*', $actionMap[$name][$action])) {
 				return true;
 			}
 
-			if (is_string($user['role'])) {
-				$user['role'] = array($user['role']);
-			}
-
-			foreach ($user['role'] as $role) {
+			foreach ($user[$roleField] as $role) {
 				if (in_array($role, $actionMap[$name][$action])) {
 					return true;
 				}
