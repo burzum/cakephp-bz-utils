@@ -32,13 +32,19 @@ class SimpleRbacAuthorize extends BaseAuthorize {
 
 		$actionMap = $this->getActionMap();
 		if (isset($actionMap[$name][$action])) {
+			if (in_array('*', $actionMap[$name])) {
+				return true;
+			}
+
 			if (in_array('*', $actionMap[$name][$action])) {
 				return true;
 			}
-			if (is_string($user[$userModel]['role'])) {
-				$user[$userModel]['role'] = array($user[$userModel]['role']);
+
+			if (is_string($user['role'])) {
+				$user['role'] = array($user['role']);
 			}
-			foreach ($user[$userModel]['role'] as $role) {
+
+			foreach ($user['role'] as $role) {
 				if (in_array($role, $actionMap[$name][$action])) {
 					return true;
 				}
@@ -57,9 +63,11 @@ class SimpleRbacAuthorize extends BaseAuthorize {
 	public function getConrollerNameAndAction(CakeRequest $request) {
 		$name = $this->_Controller->name;
 		$action = $this->_Controller->action;
+
 		if (!empty($request->params['plugin'])) {
 			$name = Inflector::camelize($request->params['plugin']) . '.' . $name;
 		}
+
 		return compact('name', 'action');
 	}
 
@@ -69,7 +77,7 @@ class SimpleRbacAuthorize extends BaseAuthorize {
  * @return array
  */
 	public function getActionMap() {
-		return Configure::read('SimpleRbac.actionMap');
+		return (array) Configure::read('SimpleRbac.actionMap');
 	}
 
 }
