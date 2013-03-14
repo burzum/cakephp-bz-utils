@@ -28,12 +28,33 @@ class SimpleRbacAuthorize extends BaseAuthorize {
  */
 	public function authorize($user, CakeRequest $request) {
 		$roleField = $this->settings['roleField'];
-		extract($this->getConrollerNameAndAction($request));
 
 		if (is_string($user[$roleField])) {
 			$user[$roleField] = array($user[$roleField]);
 		}
 
+		if ($this->authorizeByPrefix($user[$roleField], $request)) {
+			return true;
+		}
+
+		if ($this->authorizeByControllerAndAction($user, $request)) {
+			return true;
+		}
+
+		return false;
+	}
+
+
+/**
+ * Checks if a role is granted access to a controller and action
+ *
+ * @param array $user
+ * @param CakeRequest $request
+ * @return boolean
+ */
+	public function authorizeByControllerAndAction($user, CakeRequest $request) {
+		$roleField = $this->settings['roleField'];
+		extract($this->getConrollerNameAndAction($request));
 		$actionMap = $this->getActionMap();
 		if (isset($actionMap[$name])) {
 			if (in_array('*', $actionMap[$name])) {
@@ -48,6 +69,26 @@ class SimpleRbacAuthorize extends BaseAuthorize {
 
 			foreach ($user[$roleField] as $role) {
 				if (in_array($role, $actionMap[$name][$action])) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+/**
+ * Checks if a role is granted access to a prefix route like /admin
+ *
+ * @param array $roles
+ * @param CakeRequest $request
+ * @return boolean
+ */
+	public function authorizeByPrefix($roles, CakeRequest $request) {
+		$prefixeMap = $this->getPrefixMap();
+		if (isset($request->params['prefix']) && isset($prefixeMap[$request->params['prefix']])) {
+			foreach ($roles as $role) {
+				if (in_array($role, $prefixeMap[$request->params['prefix']])) {
 					return true;
 				}
 			}
@@ -80,6 +121,15 @@ class SimpleRbacAuthorize extends BaseAuthorize {
  */
 	public function getActionMap() {
 		return (array) Configure::read('SimpleRbac.actionMap');
+	}
+
+/**
+ * Can be overriden if inherited with a method to fetch this from anywhere, a database for exaple
+ *
+ * @return array
+ */
+	public function getPrefixMap() {
+		return (array) Configure::read('SimpleRbac.prefixMap');
 	}
 
 }
