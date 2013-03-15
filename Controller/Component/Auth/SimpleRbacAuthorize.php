@@ -20,14 +20,34 @@ App::uses('BaseAuthorize', 'Controller/Component/Auth');
 class SimpleRbacAuthorize extends BaseAuthorize {
 
 /**
+ * Settings for authorize objects.
+ *
+ * - `userModel` - Model name that user records can be found under. Defaults to 'User'.
+ * - `roleField` - The name of the role field in the user data array that is passed to authorize()
+ *
+ * @var array
+ */
+	public $settings = array(
+		'userModel' => 'User',
+		'roleField' => 'role',
+		'allowEmptyActionMap' => false,
+		'allowEmptyPrefixMap' => true,
+	);
+
+/**
  * Authorize a user based on his roles
  *
  * @param array $user The user to authorize
  * @param CakeRequest $request The request needing authorization.
  * @return boolean
+ * @throws RuntimeException when the role field does not exist
  */
 	public function authorize($user, CakeRequest $request) {
 		$roleField = $this->settings['roleField'];
+
+		if (!isset($user[$roleField])) {
+			throw new RuntimeException(__d('bz_utils', 'The role field %s does not exist!'));
+		}
 
 		if (is_string($user[$roleField])) {
 			$user[$roleField] = array($user[$roleField]);
@@ -118,18 +138,28 @@ class SimpleRbacAuthorize extends BaseAuthorize {
  * Can be overriden if inherited with a method to fetch this from anywhere, a database for exaple
  *
  * @return array
+ * @throws RuntimeException
  */
 	public function getActionMap() {
-		return (array) Configure::read('SimpleRbac.actionMap');
+		$actionMap = (array) Configure::read('SimpleRbac.actionMap');
+		if (empty($actionMap) && $this->settings['allowEmptyActionMap'] === false) {
+			throw new RuntimeException(__d('bz_utils', 'SimpleRbac.actionMap configuration is empty!'));
+		}
+		return $actionMap;
 	}
 
 /**
  * Can be overriden if inherited with a method to fetch this from anywhere, a database for exaple
  *
  * @return array
+ * @throws RuntimeException
  */
 	public function getPrefixMap() {
-		return (array) Configure::read('SimpleRbac.prefixMap');
+		$prefixMap = (array) Configure::read('SimpleRbac.prefixMap');
+		if (empty($prefixMap) && $this->settings['allowEmptyPrefixMap'] === false) {
+			throw new RuntimeException(__d('bz_utils', 'SimpleRbac.prefixMap configuration is empty!'));
+		}
+		return $prefixMap;
 	}
 
 }
