@@ -20,25 +20,50 @@ App::uses('BaseAuthorize', 'Controller/Component/Auth');
 class SimpleRbacAuthorize extends BaseAuthorize {
 
 /**
+ * Default settings
+ * @var array
+ */
+	protected $_defaultSettings = array(
+		'roleField' => 'role',
+	);
+
+/**
+ * Constructor
+ *
+ * @param ComponentCollection $collection The controller for this request.
+ * @param string $settings An array of settings. This class does not use any settings.
+ */
+	public function __construct(ComponentCollection $collection, $settings = array()) {
+		parent::__construct($collection, $settings);
+		$this->settings = Hash::merge($this->settings, $this->_defaultSettings, $settings);
+	}
+
+/**
  * Authorize a user based on his roles
  *
  * @param array $user The user to authorize
  * @param CakeRequest $request The request needing authorization.
- * @return boolean
+ * @return boolean true if the action is configured for all access '*' or there is
+ * a role field and the role is defined in the action mapping array
  */
 	public function authorize($user, CakeRequest $request) {
 		$userModel = $this->settings['userModel'];
-		extract($this->getConrollerNameAndAction($request));
+		$roleField = $this->settings['roleField'];
+		extract($this->getControllerNameAndAction($request));
 
 		$actionMap = $this->getActionMap();
+
 		if (isset($actionMap[$name][$action])) {
 			if (in_array('*', $actionMap[$name][$action])) {
 				return true;
 			}
-			if (is_string($user[$userModel]['role'])) {
-				$user[$userModel]['role'] = array($user[$userModel]['role']);
+			if (empty($user[$userModel][$roleField])) {
+				return false;
 			}
-			foreach ($user[$userModel]['role'] as $role) {
+			if (is_string($user[$userModel][$roleField])) {
+				$user[$userModel][$roleField] = array($user[$userModel][$roleField]);
+			}
+			foreach ($user[$userModel][$roleField] as $role) {
 				if (in_array($role, $actionMap[$name][$action])) {
 					return true;
 				}
@@ -54,7 +79,7 @@ class SimpleRbacAuthorize extends BaseAuthorize {
  * @param CakeRequest $request
  * @return array
  */
-	public function getConrollerNameAndAction(CakeRequest $request) {
+	public function getControllerNameAndAction(CakeRequest $request) {
 		$name = $this->_Controller->name;
 		$action = $this->_Controller->action;
 		if (!empty($request->params['plugin'])) {

@@ -5,6 +5,7 @@ App::uses('CakeRequest', 'Network');
 App::uses('CakeResponse', 'Network');
 
 class SimpleRbacTestController extends Controller {
+
 	public $name = 'SimpleRbacTest';
 }
 
@@ -70,11 +71,30 @@ class SimpleRbacAuthorizeTest extends CakeTestCase {
 		$request->params['plugin'] = 'rbac';
 		$this->assertTrue($this->auth->authorize($user, $request));
 
-
 		$this->controller->name = 'Roles';
 		$this->controller->action = 'index';
 		$request = new CakeRequest('/rbac/roles/index', false);
 		$request->params['plugin'] = 'rbac';
+		$this->assertTrue($this->auth->authorize($user, $request));
+	}
+
+/**
+ * test isAuthorized with custom roleField.
+ *
+ * @return void
+ */
+	public function testAuthorizeCustomRoleField() {
+		$user = array(
+			'User' => array(
+				'anotherRoleField' => 'admin'));
+
+		$this->controller->name = 'Roles';
+		$this->controller->action = 'add';
+		$request = new CakeRequest('/rbac/roles/add', false);
+		$request->params['plugin'] = 'rbac';
+		$this->assertFalse($this->auth->authorize($user, $request));
+
+		$this->auth->settings['roleField'] = 'anotherRoleField';
 		$this->assertTrue($this->auth->authorize($user, $request));
 	}
 
