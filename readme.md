@@ -25,13 +25,13 @@ For support and feature request, please visit the [BzUtils Plugin Support Site](
 
 ## License ##
 
-Copyright 2011, [Florian Krämer](http://github.com/burzum)
+Copyright 2011 - 2014, [Florian Krämer](http://github.com/burzum)
 
 Licensed under [The MIT License](http://www.opensource.org/licenses/mit-license.php)<br/>
 Redistributions of files must retain the above copyright notice.
 
 ## Copyright ###
 
-Copyright 2011
+Copyright 2011 - 2014
 Florian Krämer
 http://github.com/burzum
