@@ -1,7 +1,13 @@
 <?php
 App::uses('AppHelper', 'View/Helper');
 App::uses('CakeSession', 'Model/Datasource');
-
+/**
+ * AuthHelper
+ *
+ * @author Florian Krämer
+ * @copyright 2013 - 2014 Florian Krämer
+ * @license MIT
+ */
 class AuthHelper extends AppHelper {
 
 /**
