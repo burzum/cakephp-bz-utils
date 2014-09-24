@@ -27,8 +27,6 @@ class LinkHelperTest extends CakeTestCase {
  * @return void
  */
 	public function setUp() {
-		ClassRegistry::flush();
-		Router::reload();
 		$null = null;
 		$this->View = new View(null);
 		$this->View->Helpers->load('Html');
@@ -48,12 +46,11 @@ class LinkHelperTest extends CakeTestCase {
 				'titleField' => 'BlogPost.title'
 			)
 		));
-
+		Router::reload();
 		Router::connect('/article/:categorySlug/:slug-:id', array(
 			'controller' => 'blog_posts',
 			'action' => 'view',
 		));
-		Router::reload();
 	}
 
 /**
@@ -82,7 +79,7 @@ class LinkHelperTest extends CakeTestCase {
 		$result = $this->Link->buildUrl($data, 'blogSlug');
 		$this->assertEquals($result, $expected);
 		$result = $this->Link->Link($data, 'blogSlug');
-		$expected = '<a href="/blog_posts/view/id:123/slug:a-fancy-posting/categorySlug:cakephp-rocks">A fancy posting!</a>';
+		$expected = '<a href="/article/cakephp-rocks/a-fancy-posting-123">A fancy posting!</a>';
 		$this->assertEquals($result, $expected);
 	}
 
