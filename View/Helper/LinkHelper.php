@@ -53,7 +53,7 @@ class LinkHelper extends AppHelper {
 			$title = $options['linkTitle'];
 			unset($options['linkTitle']);
 		} else {
-			throw new \RuntimeException(__('Missing title!'));
+			throw new RuntimeException(__d('bz_utils', 'Missing title!'));
 		}
 		if (isset($options['alias'])) {
 			$preset['alias'] = $options['alias'];
@@ -78,19 +78,19 @@ class LinkHelper extends AppHelper {
  *
  * @param array $data
  * @param string $identifier
+ * @param array $options
  * @throws RuntimeException
  * @throws InvalidArgumentException
  * @return array
  */
-	public function buildUrl($data, $identifier) {
+	public function buildUrl($data, $identifier, $options = array()) {
 		if (is_string($identifier)) {
 			$preset = $this->_getPreset($identifier);
 		} elseif (is_array($identifier)) {
 			$preset = $identifier;
 		} else {
-			throw new InvalidArgumentException(__('Must be string or array!'));
+			throw new InvalidArgumentException(__d('bz_utils', 'Must be string or array!'));
 		}
-
 		$urlVars = array();
 		foreach ($preset['fieldMap'] as $urlVar => $field) {
 			if (isset($preset['alias'])) {
@@ -100,9 +100,29 @@ class LinkHelper extends AppHelper {
 			if (!is_null($result)) {
 				$urlVars[$urlVar] = $result;
 			} else {
-				throw new \RuntimeException(__('Missing field %s!', $field));
+				throw new RuntimeException(__d('bz_utils', 'Missing field %s!', $field));
 			}
 		}
-		return Hash::merge($preset['preset'], $urlVars);
+		$url = Hash::merge($preset['preset'], $urlVars);
+		if (isset($options['string']) && $options['string'] === true) {
+			$fullBase = (isset($options['fullBase']) && $options['fullBase'] === true);
+			return Rounter::url($url, $fullBase);
+		}
+		return $url;
+	}
+
+/**
+ * Convenience method to get a string $url with full base path
+ *
+ * @param array $data
+ * @param string $identifier
+ * @param boolean
+ * @return string
+ */
+	public function stringUrl($data, $identifier, $fullBase = false) {
+		return $this->buildUrl($data, $identifier, array(
+			'string' => true,
+			'fullBase' => $fullBase
+		));
 	}
 }
