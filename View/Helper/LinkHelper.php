@@ -106,7 +106,7 @@ class LinkHelper extends AppHelper {
 		$url = Hash::merge($preset['preset'], $urlVars);
 		if (isset($options['string']) && $options['string'] === true) {
 			$fullBase = (isset($options['fullBase']) && $options['fullBase'] === true);
-			return Rounter::url($url, $fullBase);
+			return Router::url($url, $fullBase);
 		}
 		return $url;
 	}
