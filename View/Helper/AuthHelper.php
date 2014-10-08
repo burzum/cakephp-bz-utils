@@ -1,6 +1,7 @@
 <?php
 App::uses('AppHelper', 'View/Helper');
 App::uses('CakeSession', 'Model/Datasource');
+
 /**
  * AuthHelper
  *
@@ -22,6 +23,13 @@ class AuthHelper extends AppHelper {
 	);
 
 /**
+ * User Data
+ *
+ * @var mixed
+ */
+	public $userData = null;
+
+/**
  * Constructor
  *
  * @param View $View
@@ -35,7 +43,9 @@ class AuthHelper extends AppHelper {
 		if (is_string($settings['session'])) {
 			$this->userData = CakeSession::read($settings['session']);
 		} else {
-			$this->userData = $this->_View->viewVars[$settings['viewVar']];
+			if (isset($this->_View->viewVars[$settings['viewVar']])) {
+				$this->userData = $this->_View->viewVars[$settings['viewVar']];
+			}
 		}
 
 		$this->settings = $settings;
