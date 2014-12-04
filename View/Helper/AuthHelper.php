@@ -105,7 +105,7 @@ class AuthHelper extends AppHelper {
 			return ($role === $roles);
 		}
 		if (is_array($roles)) {
-			return (in_array($role, $role));
+			return (in_array($role, $roles));
 		}
 		return false;
 	}
