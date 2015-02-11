@@ -66,15 +66,19 @@ class TemplateUrl {
 			throw new \InvalidArgumentException(__d('bz_utils', 'Must be string or array!'));
 		}
 		$urlVars = array();
-		foreach ($preset['fieldMap'] as $urlVar => $field) {
-			if (isset($preset['alias'])) {
-				$field = str_replace('{alias}', $preset['alias'], $field);
-			}
-			$result = Hash::get($data, $field);
-			if (!is_null($result)) {
-				$urlVars[$urlVar] = $result;
-			} else {
-				throw new \RuntimeException(__d('bz_utils', 'Missing field %s!', $field));
+		if (is_callable($preset['fieldMap'])) {
+			$preset['preset'] = $preset['fieldMap']($data, $preset);
+		} else {
+			foreach ($preset['fieldMap'] as $urlVar => $field) {
+				if (isset($preset['alias'])) {
+					$field = str_replace('{alias}', $preset['alias'], $field);
+				}
+				$result = Hash::get($data, $field);
+				if (!is_null($result)) {
+					$urlVars[$urlVar] = $result;
+				} else {
+					throw new \RuntimeException(__d('bz_utils', 'Missing field %s!', $field));
+				}
 			}
 		}
 		$url = Hash::merge($preset['preset'], $urlVars);
