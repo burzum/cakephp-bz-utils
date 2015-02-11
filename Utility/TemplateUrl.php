@@ -13,6 +13,13 @@ class TemplateUrl {
 	protected static $_templates = [];
 
 /**
+ * Cache config to use for the URLs
+ *
+ * @var mixed
+ */
+	protected static $_cacheConfig = false;
+
+/**
  * Loads presets from the configuration.
  *
  * @param string $configKey Config key to load the templates from.
@@ -20,6 +27,16 @@ class TemplateUrl {
  */
 	public static function loadPresetsFromConfig($configKey = 'App.linkMap') {
 		self::$_templates = Hash::merge(self::$_templates, (array)Configure::read($configKey));
+	}
+
+/**
+ * Sets the cache config.
+ *
+ * @var mixed
+ * @return void
+ */
+	public static function setCache($cache) {
+		self::$_cacheConfig = $cache;
 	}
 
 /**
@@ -58,6 +75,14 @@ class TemplateUrl {
  * @return array
  */
 	public static function url($data, $identifier, $options = array()) {
+		if (self::$_cacheConfig !== false) {
+			$cacheKey = md5(serialize($data) . serialize($options)) . $identifier;
+			$url = Cache::read($cacheKey, self::$_cacheConfig);
+			if (!empty($url)) {
+				return $url;
+			}
+		}
+
 		if (is_string($identifier)) {
 			$preset = self::getTemplate($identifier);
 		} elseif (is_array($identifier)) {
@@ -65,10 +90,29 @@ class TemplateUrl {
 		} else {
 			throw new \InvalidArgumentException(__d('bz_utils', 'Must be string or array!'));
 		}
-		$urlVars = array();
+
+		$url = self::_buildUrlArray($data, $preset);
+
+		if (isset($options['string']) && $options['string'] === true) {
+			$fullBase = (isset($options['fullBase']) && $options['fullBase'] === true);
+			$url = Router::url($url, $fullBase);
+			if (self::$_cacheConfig !== false) {
+				Cache::write($cacheKey, $url, self::$_cacheConfig);
+			}
+			return $url;
+		}
+
+		if (self::$_cacheConfig !== false) {
+			Cache::write($cacheKey, $url, self::$_cacheConfig);
+		}
+		return $url;
+	}
+
+	protected static function _buildUrlArray($data, $preset) {
 		if (is_callable($preset['fieldMap'])) {
-			$preset['preset'] = $preset['fieldMap']($data, $preset);
+			return $preset['fieldMap']($data, $preset);
 		} else {
+			$urlVars = array();
 			foreach ($preset['fieldMap'] as $urlVar => $field) {
 				if (isset($preset['alias'])) {
 					$field = str_replace('{alias}', $preset['alias'], $field);
@@ -80,13 +124,8 @@ class TemplateUrl {
 					throw new \RuntimeException(__d('bz_utils', 'Missing field %s!', $field));
 				}
 			}
+			return Hash::merge($preset['preset'], $urlVars);
 		}
-		$url = Hash::merge($preset['preset'], $urlVars);
-		if (isset($options['string']) && $options['string'] === true) {
-			$fullBase = (isset($options['fullBase']) && $options['fullBase'] === true);
-			return Router::url($url, $fullBase);
-		}
-		return $url;
 	}
 
 /**
