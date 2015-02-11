@@ -10,6 +10,7 @@
  */
 
 App::uses('AppHelper', 'View/Helper');
+App::uses('TemplateUrl', 'BzUtils.Utility');
 
 class LinkHelper extends AppHelper {
 
@@ -21,6 +22,17 @@ class LinkHelper extends AppHelper {
 	public $helpers = array(
 		'Html'
 	);
+
+/**
+ * Default Constructor
+ *
+ * @param View $View The View this helper is being attached to.
+ * @param array $settings Configuration settings for the helper.
+ */
+	public function __construct(View $View, $settings = array()) {
+		parent::__construct($View, $settings);
+		TemplateUrl::loadPresetsFromConfig();
+	}
 
 /**
  * Convenience method to add a title
@@ -70,7 +82,7 @@ class LinkHelper extends AppHelper {
  * @return array
  */
 	protected function _getPreset($identifier) {
-		return (array)Configure::read('App.linkMap.' . $identifier);
+		return TemplateUrl::getTemplate($identifier);
 	}
 
 /**
@@ -84,31 +96,7 @@ class LinkHelper extends AppHelper {
  * @return array
  */
 	public function buildUrl($data, $identifier, $options = array()) {
-		if (is_string($identifier)) {
-			$preset = $this->_getPreset($identifier);
-		} elseif (is_array($identifier)) {
-			$preset = $identifier;
-		} else {
-			throw new InvalidArgumentException(__d('bz_utils', 'Must be string or array!'));
-		}
-		$urlVars = array();
-		foreach ($preset['fieldMap'] as $urlVar => $field) {
-			if (isset($preset['alias'])) {
-				$field = str_replace('{alias}', $preset['alias'], $field);
-			}
-			$result = Hash::get($data, $field);
-			if (!is_null($result)) {
-				$urlVars[$urlVar] = $result;
-			} else {
-				throw new RuntimeException(__d('bz_utils', 'Missing field %s!', $field));
-			}
-		}
-		$url = Hash::merge($preset['preset'], $urlVars);
-		if (isset($options['string']) && $options['string'] === true) {
-			$fullBase = (isset($options['fullBase']) && $options['fullBase'] === true);
-			return Router::url($url, $fullBase);
-		}
-		return $url;
+		return TemplateUrl::url($data, $identifier, $options);
 	}
 
 /**
@@ -120,9 +108,6 @@ class LinkHelper extends AppHelper {
  * @return string
  */
 	public function stringUrl($data, $identifier, $fullBase = false) {
-		return $this->buildUrl($data, $identifier, array(
-			'string' => true,
-			'fullBase' => $fullBase
-		));
+		return TemplateUrl::stringUrl($data, $identifier, $fullBase);
 	}
 }

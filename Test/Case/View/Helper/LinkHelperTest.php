@@ -27,10 +27,6 @@ class LinkHelperTest extends CakeTestCase {
  * @return void
  */
 	public function setUp() {
-		$null = null;
-		$this->View = new View(null);
-		$this->View->Helpers->load('Html');
-		$this->Link = new LinkHelper($this->View);
 		Configure::write('App.linkMap', array(
 			'blogSlug' => array(
 				'preset' => array(
@@ -46,6 +42,11 @@ class LinkHelperTest extends CakeTestCase {
 				'titleField' => 'BlogPost.title'
 			)
 		));
+
+		$null = null;
+		$this->View = new View(null);
+		$this->View->Helpers->load('Html');
+		$this->Link = new LinkHelper($this->View);
 		Router::reload();
 		Router::connect('/article/:categorySlug/:slug-:id', array(
 			'controller' => 'blog_posts',
@@ -58,7 +59,7 @@ class LinkHelperTest extends CakeTestCase {
  *
  * @return void
  */
-	public function testTableHelper() {
+	public function testLinkHelper() {
 		$data = array(
 			'BlogPost' => array(
 				'id' => 123,
