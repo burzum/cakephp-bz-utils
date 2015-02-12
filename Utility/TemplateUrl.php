@@ -67,7 +67,7 @@ class TemplateUrl {
 /**
  * Builds an URL array based on a preset.
  *
- * @param array $data
+ * @param array $data Data for the URL params.
  * @param string $identifier
  * @param array $options
  * @throws RuntimeException
@@ -108,6 +108,13 @@ class TemplateUrl {
 		return $url;
 	}
 
+/**
+ * Builds the actual URL array.
+ *
+ * @param array $data Data for the URL params.
+ * @param array $preset Preset array.
+ * @return array
+ */
 	protected static function _buildUrlArray($data, $preset) {
 		if (is_callable($preset['fieldMap'])) {
 			return $preset['fieldMap']($data, $preset);
@@ -131,7 +138,7 @@ class TemplateUrl {
 /**
  * Convenience method to get a string $url with full base path.
  *
- * @param array $data
+ * @param array $data Data for the URL params.
  * @param string $identifier
  * @param boolean
  * @return string
