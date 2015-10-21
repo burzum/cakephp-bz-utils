@@ -4,7 +4,8 @@ This plugin is a collection of CakePHP utils.
 
 ## Components ##
 
-* Auth/SimpleRbacAuthorize - Basic multi-role non database RBAC, using an array as permission map
+* Auth/SimpleRbacAuthorize - Basic multi-role non database RBAC, using an array as permission map.
+* Auth/JwtTokenAuthenticate - [JWT Token](http://tools.ietf.org/html/draft-ietf-oauth-json-web-token-25) authentication, read [this article](http://florian-kraemer.net/2014/07/cakephp-and-token-based-auth-with-angular-js/) for further information.
 
 ## Helpers
 
