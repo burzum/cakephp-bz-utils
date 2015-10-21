@@ -2,6 +2,13 @@
 App::uses('AppHelper', 'View/Helper');
 App::uses('CakeSession', 'Model/Datasource');
 
+/**
+ * AuthHelper
+ *
+ * @author Florian Krämer
+ * @copyright 2013 - 2014 Florian Krämer
+ * @license MIT
+ */
 class AuthHelper extends AppHelper {
 
 /**
@@ -14,6 +21,13 @@ class AuthHelper extends AppHelper {
 		'viewVar' => 'userData',
 		'roleField' => 'role'
 	);
+
+/**
+ * User Data
+ *
+ * @var mixed
+ */
+	public $userData = null;
 
 /**
  * Constructor
@@ -29,7 +43,9 @@ class AuthHelper extends AppHelper {
 		if (is_string($settings['session'])) {
 			$this->userData = CakeSession::read($settings['session']);
 		} else {
-			$this->userData = $this->_View->viewVars[$settings['viewVar']];
+			if (isset($this->_View->viewVars[$settings['viewVar']])) {
+				$this->userData = $this->_View->viewVars[$settings['viewVar']];
+			}
 		}
 
 		$this->settings = $settings;
@@ -89,7 +105,7 @@ class AuthHelper extends AppHelper {
 			return ($role === $roles);
 		}
 		if (is_array($roles)) {
-			return (in_array($role, $role));
+			return (in_array($role, $roles));
 		}
 		return false;
 	}
