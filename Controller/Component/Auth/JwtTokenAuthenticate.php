@@ -114,7 +114,7 @@ class JwtTokenAuthenticate extends BaseAuthenticate {
  */
 	public function _findUser($username, $password = null) {
 		try {
-			$decoded = JWT::decode($username, Configure::read('Security.salt'));
+			$decoded = Firebase\JWT\JWT::decode($username, Configure::read('Security.salt'), array('HS256'));
 			return json_decode(json_encode($decoded), true);
 		} catch (UnexpectedValueException $e) {
 			return false;
