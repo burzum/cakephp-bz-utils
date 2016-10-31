@@ -1,4 +1,4 @@
-# BzUtils Plugin for CakePHP #
+# BzUtils Plugin for CakePHP 2.x #
 
 This plugin is a collection of CakePHP utils.
 
